@@ -31,11 +31,11 @@ rootMethods.post = function(request, response){
   request.on('end', function(){
     websiteName = querystring.parse(websiteName);
     if (urlRegex.test(websiteName.url)) {
-      //websiteName = JSON.parse(websiteName);
       fs.appendFile(module.exports.datadir, websiteName.url + '\n', function(err){
         if (err) throw err;
         console.log(websiteName.url + " was saved!");
       });
+      //websiteName = JSON.parse(websiteName);
       response.writeHead(201, helpers.headers);
       helpers.serveStaticAssets("/index.html", response);
     } else {
@@ -55,6 +55,9 @@ exports.handleRequest = function (request, response) {
   if(router[pathname]) {
     var method = router[pathname];
     method(request, response);
+  }
+  if (urlRegex.test(pathname.slice(1))) {
+    helpers.getFromDatabase(pathname.slice(1), response);
   }
   helpers.walk(path.join(__dirname, 'public'), function(err, list){
     if(list.indexOf(pathname) >= 0){

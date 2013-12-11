@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var directory = require('./request-handler').datadir;
+var mysql = require('mysql');
 
 exports.headers = headers = {
   "access-control-allow-origin": "*",
@@ -10,11 +11,31 @@ exports.headers = headers = {
   'Content-Type': "text/html"
 };
 
+var connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'plantlife',
+  port: 3306
+});
+
+connection.query('use webhistorical');
+
 exports.serveStaticAssets = function(file, res){
   res.writeHead(200, headers);
   res.end(fs.readFileSync(__dirname + '/public' + file));
   // fs.createReadStream(path.join(__dirname, 'public' + file), {encoding: 'utf8'}).pipe(response);
 };
+
+exports.getFromDatabase = function(file, res){
+  connection.query('select html from webpages where url=\'' + file + '\'', function(err, content){
+    console.log('select html from webpages where url=' + file + '\'');
+    debugger;
+    if (err) throw err;
+    res.writeHead(200, headers);
+    res.end(content);
+  });
+};
+
 
 exports.walk = function(dir, done, base) {
   base = base || "";
