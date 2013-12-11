@@ -9,9 +9,29 @@ exports.headers = headers = {
   'Content-Type': "text/html"
 };
 
-exports.serveStaticAssets = function(res, folder, asset) {
+exports.servIndex = function(request, response, headers){
+  fs.readFile('public/index.html', function(err, content) {
+    headers['Content-Type'] = "text/html";
+    console.log(err);
+    response.writeHead(200, headers);
+    response.write(content);
+    console.log(response);
+    response.end();
+  });
+};
+
+exports.serveStaticAssets = function(request, response, headers) {
+  fs.readFile('public/styles.css', function(err, content) {
+    headers['Content-Type'] = "text/css";
+    console.log(err);
+    response.writeHead(200, headers);
+    response.write(content);
+    response.end();
+  });
   //Write some code here that helps serve up your static files!
   //(Static files are things like html (yours or arhived from others...), css, or anything that doesn't change often.)
 };
+
+exports.headers = headers;
 
 // As you go through, keep thinking about what helper functions you can put here!
