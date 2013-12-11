@@ -3,9 +3,31 @@
 <head>
   <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
-<body>
-  <form method="POST">
-    <input type="input" name="url"></input>
-  </form>
-</body>
+  <body>
+    <h1>NotWayBackAtAll Machine</h1>
+    Please enter the url you wish to archive:
+    <form method="POST">
+      <input type="input" name="url"></input>
+    </form>
+    <div id="archived">
+      <ul></ul>
+    </div>
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/backbone/backbone-min.js"></script>
+    <script src="app/collections/homepageCollection.js"></script>
+    <script src="app/views/homepageView.js"></script>
+    <script>
+      $(function(){
+        $.get( "/sites", function( data ) {
+          data = JSON.parse(data);
+          var websites = _(data).map(function(item){
+            return {url: item};
+          })
+          var homepageCollection = new HomepageCollection(websites);
+          var homepageView = new HomepageView({collection: homepageCollection});
+        });
+      })
+    </script>
+  </body>
 </html>
