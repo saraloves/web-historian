@@ -13,9 +13,15 @@ exports.headers = headers = {
 
 
 exports.serveStaticAssets = function(file, res){
-  res.writeHead(200, headers);
-  res.end(fs.readFileSync(__dirname + '/public' + file));
-  // fs.createReadStream(path.join(__dirname, 'public' + file), {encoding: 'utf8'}).pipe(response);
+  fs.readFile(path.join(__dirname, 'public', file), {encoding: 'utf8'},function(err, asset){
+    if(err){
+      res.writeHead(404, headers);
+      res.end();
+    } else {
+      res.writeHead(200, headers);
+      res.end(asset);
+    }
+  });
 };
 
 exports.getFromDatabase = function(file, res){
@@ -28,7 +34,7 @@ exports.getFromDatabase = function(file, res){
   connection.query('use webhistorical');
   connection.query('select html from webpages where url=\'' + file + '\'', function(err, content){
     console.log('select html from webpages where url=' + file + '\'');
-    if (err) throw err;
+    if (err || !content[0]) throw err;
     res.writeHead(200, headers);
     res.end(content[0].html);
   });

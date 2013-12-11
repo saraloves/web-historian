@@ -1,3 +1,6 @@
 www.google.com
 www.hackreactor.com
 www.pokemon.com
+www.reddit.com
+www.cnn.com
+www.amazon.com

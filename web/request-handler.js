@@ -15,7 +15,7 @@ var rootMethods = function(request, response){
     response.writeHead(200, helpers.headers);
     response.end();
   }
-  if(request.method == "POST"){
+  if(request.method === "POST"){
     rootMethods.post(request, response);
   }
   if (request.method === "GET"){
@@ -45,8 +45,32 @@ rootMethods.post = function(request, response){
   });
 };
 
+var sitesMethods = function(request, response) {
+  if(request.method === "OPTIONS"){
+    response.writeHead(200, helpers.headers);
+    response.end();
+  }
+  if(request.method === "POST"){
+    sitesMethods.post(request, response);
+  }
+  if (request.method === "GET"){
+    sitesMethods.get(request, response);
+  }
+};
+
+sitesMethods.get = function(request, response){
+  fs.readFile(module.exports.datadir, {encoding: 'utf8'}, function(err, data){
+    if(err) throw "Y U NO READ";
+    response.writeHead(200, headers);
+    data = data.split('\n');
+    data.pop();
+    response.end(JSON.stringify(data));
+  });
+};
+
 var router = {
-  "/": rootMethods
+  "/": rootMethods,
+  "/sites": sitesMethods
 };
 
 exports.handleRequest = function (request, response) {
@@ -57,27 +81,13 @@ exports.handleRequest = function (request, response) {
     return method(request, response);
   }
   if (urlRegex.test(pathname.slice(1))) {
-    return helpers.getFromDatabase(pathname.slice(1), response);
-  }
-  helpers.walk(path.join(__dirname, 'public'), function(err, list){
-    if(list.indexOf(pathname) >= 0){
-      helpers.serveStaticAssets(pathname, response);
-    } else {
-      fs.readdir(path.join(__dirname, "../data/sites"), function(err, cachedSites){
-        if (err) {
-          throw("Error");
-        }
-        if (cachedSites.indexOf(pathname.slice(1)) >= 0) {
-          helpers.servePage(pathname, response);
-        } else {
-          response.writeHead(404, helpers.headers);
-          response.end();
-        }
-      });
-
-      // handler.handleRequest(request, response);
+    if(!helpers.getFromDatabase(pathname.slice(1), response)){
+      response.writeHead(200, {location: '/'});
+      response.end();
     }
-  });
+  }
+  helpers.serveStaticAssets(pathname, response);
+      // handler.handleRequest(request, response);
 };
 
 //1. check to see if there's a static serveStaticAssets
