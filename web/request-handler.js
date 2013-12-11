@@ -54,10 +54,10 @@ exports.handleRequest = function (request, response) {
   var pathname = url.parse(request.url).pathname;
   if(router[pathname]) {
     var method = router[pathname];
-    method(request, response);
+    return method(request, response);
   }
   if (urlRegex.test(pathname.slice(1))) {
-    helpers.getFromDatabase(pathname.slice(1), response);
+    return helpers.getFromDatabase(pathname.slice(1), response);
   }
   helpers.walk(path.join(__dirname, 'public'), function(err, list){
     if(list.indexOf(pathname) >= 0){

@@ -1,4 +1,4 @@
-// eventually, you'll have some code here that uses the tested helpers 
+// eventually, you'll have some code here that uses the tested helpers
 // to actually download the urls you want to download.
 
 var path   = require('path');
@@ -7,14 +7,6 @@ var http   = require('http');
 var mysql  = require('mysql');
 var moment = require('moment');
 
-var connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'plantlife',
-  port: 3306
-});
-
-connection.query('use webhistorical');
 
 var readUrls = function(filepath, callback){
   fs.readFile(filepath, {encoding: 'utf8'}, function(err, data){
@@ -41,10 +33,19 @@ var downloadUrls = function(sitesArray){
         //   console.log('It\'s saved!');
         // });
 
+        var connection = mysql.createConnection({
+          host: 'localhost',
+          user: 'root',
+          password: 'plantlife',
+          port: 3306
+        });
+
+        connection.query('use webhistorical');
         connection.query('insert into webpages (url, html, createdAt) value(' + mysql.escape(site) + ', ' + mysql.escape(html) + ', ' + moment().format('YYYY-MM-DD') + ');', function(err){
           console.log('insert into webpages (url, html, createdAt) value(' + mysql.escape(site) + ', html,\'' + moment().format('YYYY-MM-DD') + '\')');
           if(err) throw err;
         });
+        connection.end();
       });
     });
     req.end();

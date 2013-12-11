@@ -11,14 +11,6 @@ exports.headers = headers = {
   'Content-Type': "text/html"
 };
 
-var connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'plantlife',
-  port: 3306
-});
-
-connection.query('use webhistorical');
 
 exports.serveStaticAssets = function(file, res){
   res.writeHead(200, headers);
@@ -27,13 +19,20 @@ exports.serveStaticAssets = function(file, res){
 };
 
 exports.getFromDatabase = function(file, res){
+  var connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'plantlife',
+    port: 3306
+  });
+  connection.query('use webhistorical');
   connection.query('select html from webpages where url=\'' + file + '\'', function(err, content){
     console.log('select html from webpages where url=' + file + '\'');
-    debugger;
     if (err) throw err;
     res.writeHead(200, headers);
-    res.end(content);
+    res.end(content[0].html);
   });
+  connection.end();
 };
 
 
